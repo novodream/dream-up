@@ -1,0 +1,26 @@
+name: 'Deploy with DReAM CLI'
+description: 'Deploy resources with DReAM CLI up command'
+inputs:
+  workspace:
+    description: 'DReAM workspace to deploy to'
+    required: true
+  private-key:
+    description: 'DReAM workspace private key'
+    required: true
+  production:
+    description: 'Enable production flag, this will remove dev dependencies (default true)'
+    default: 'true'
+runs:
+  using: "composite"
+  steps:
+    - name: Deploy
+      env:
+        PRIVATE_KEY: ${{ inputs.private-key }}
+        WORKSPACE: ${{ inputs.workspace }}
+        FLAG: ${{ inputs.production == 'true' && '--production' || '' }}
+      run: |
+        echo "${PRIVATE_KEY}" > ~/dream-private-${WORKSPACE}.pem
+        dream set-private-key -w ${WORKSPACE} ~/dream-private-${WORKSPACE}.pem
+        dream init -w ${WORKSPACE}
+        dream up ${FLAG}
+      shell: "bash"
