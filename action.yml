@@ -10,6 +10,9 @@ inputs:
   production:
     description: 'Enable production flag, this will remove dev dependencies (default true)'
     default: 'true'
+  flag:
+    description: 'Flag to pass to dream up command'
+    required: false
 runs:
   using: "composite"
   steps:
@@ -18,9 +21,10 @@ runs:
         PRIVATE_KEY: ${{ inputs.private-key }}
         WORKSPACE: ${{ inputs.workspace }}
         FLAG: ${{ inputs.production == 'true' && '--production' || '' }}
+        FLAG2: ${{ inputs.flag || '' }}
       run: |
         echo "${PRIVATE_KEY}" > ~/dream-private-${WORKSPACE}.pem
         dream set-private-key -w ${WORKSPACE} ~/dream-private-${WORKSPACE}.pem
         dream init -w ${WORKSPACE}
-        dream up ${FLAG}
+        dream up ${FLAG} ${FLAG2}
       shell: "bash"
